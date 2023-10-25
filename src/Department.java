@@ -1,37 +1,29 @@
 import java.util.ArrayList;
 import java.util.List;
 
-class Department {
+public class Department {
     private String name;
-    private int numberOfEmployees;
     private List<Employee> employees;
 
     public Department(String name) {
         this.name = name;
-        this.numberOfEmployees = 0;
-        this.employees = new ArrayList<>();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getNumberOfEmployees() {
-        return numberOfEmployees;
-    }
-
-    public List<Employee> getEmployees() {
-        return employees;
+        employees = new ArrayList<>();
     }
 
     public void addEmployee(Employee employee) {
         employees.add(employee);
-        numberOfEmployees++;
     }
 
     public void removeEmployee(Employee employee) {
         employees.remove(employee);
-        numberOfEmployees--;
+    }
+
+    public int getNumberOfEmployees() {
+        return employees.size();
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
     }
 
     public double getSalarySum() {
@@ -40,5 +32,18 @@ class Department {
             sum += employee.getSalary();
         }
         return sum;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
