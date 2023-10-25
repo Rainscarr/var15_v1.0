@@ -13,6 +13,9 @@ public class EnterpriseGUI extends JFrame {
     private JList<Employee> employeeList;
     private JTextArea infoArea;
 
+    private Department selectedDepartment;
+    private Employee selectedEmployee;
+
     public EnterpriseGUI(Enterprise enterprise) {
         this.enterprise = enterprise;
 
@@ -24,6 +27,20 @@ public class EnterpriseGUI extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         add(panel);
+
+        // Создаем кнопку "Добавить отдел"
+        JButton addDepartmentButton = new JButton("Добавить отдел");
+        JButton editDepartmentButton = new JButton("Изменить отдел");
+        JButton deleteDepartmentButton = new JButton("Удалить отдел");
+
+        // Панель с кнопками управления отделами
+        JPanel departmentButtonPanel = new JPanel();
+        departmentButtonPanel.add(addDepartmentButton);
+        departmentButtonPanel.add(editDepartmentButton);
+        departmentButtonPanel.add(deleteDepartmentButton);
+
+        // Добавляем панель с кнопками управления отделами в верхнюю часть
+        panel.add(departmentButtonPanel, BorderLayout.NORTH);
 
         // Создаем список отделов
         departmentListModel = new DefaultListModel<>();
@@ -40,20 +57,24 @@ public class EnterpriseGUI extends JFrame {
         // Создаем JSplitPane, чтобы разделить окно на три части
         JSplitPane splitPane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(departmentList), new JScrollPane(employeeList));
         JSplitPane splitPane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, splitPane1, new JScrollPane(infoArea));
-        splitPane1.setResizeWeight(0.2);
-        splitPane2.setResizeWeight(0.5);
+        splitPane1.setResizeWeight(0.3);
+        splitPane2.setResizeWeight(0.2);
 
         panel.add(splitPane2, BorderLayout.CENTER);
 
-        // Создаем кнопку "Добавить отдел"
-        JButton addDepartmentButton = new JButton("Добавить отдел");
-
         // Создаем кнопку "Добавить сотрудника"
         JButton addEmployeeButton = new JButton("Добавить сотрудника");
+        JButton editEmployeeButton = new JButton("Изменить сотрудника");
+        JButton deleteEmployeeButton = new JButton("Удалить сотрудника");
 
-        // Добавляем компоненты на панель
-        panel.add(addDepartmentButton, BorderLayout.NORTH);
-        panel.add(addEmployeeButton, BorderLayout.SOUTH);
+        // Панель с кнопками управления сотрудниками
+        JPanel employeeButtonPanel = new JPanel();
+        employeeButtonPanel.add(addEmployeeButton);
+        employeeButtonPanel.add(editEmployeeButton);
+        employeeButtonPanel.add(deleteEmployeeButton);
+
+        // Добавляем панель с кнопками управления сотрудниками в нижнюю часть
+        panel.add(employeeButtonPanel, BorderLayout.SOUTH);
 
         // Добавляем обработчик события для кнопки "Добавить отдел"
         addDepartmentButton.addActionListener(new ActionListener() {
@@ -79,7 +100,6 @@ public class EnterpriseGUI extends JFrame {
                     String employeeSalaryString = JOptionPane.showInputDialog(null, "Введите зарплату сотрудника:", "Добавление сотрудника", JOptionPane.PLAIN_MESSAGE);
                     double employeeSalary = Double.parseDouble(employeeSalaryString);
 
-                    Department selectedDepartment = departmentList.getSelectedValue();
                     if (selectedDepartment != null) {
                         Employee employee = new Employee(employeeName, employeeAge, employeeSalary);
                         selectedDepartment.addEmployee(employee);
@@ -89,10 +109,72 @@ public class EnterpriseGUI extends JFrame {
             }
         });
 
+        // Добавляем обработчик события для кнопки "Изменить отдел"
+        editDepartmentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectedDepartment != null) {
+                    String newDepartmentName = JOptionPane.showInputDialog(null, "Введите новое название отдела:", "Изменение отдела", JOptionPane.PLAIN_MESSAGE);
+                    if (newDepartmentName != null && !newDepartmentName.isEmpty()) {
+                        selectedDepartment.setName(newDepartmentName);
+                        int selectedIndex = departmentList.getSelectedIndex();
+                        departmentListModel.setElementAt(selectedDepartment, selectedIndex);
+                    }
+                }
+            }
+        });
+
+        // Добавляем обработчик события для кнопки "Удалить отдел"
+        deleteDepartmentButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectedDepartment != null) {
+                    enterprise.removeDepartment(selectedDepartment);
+                    departmentListModel.removeElement(selectedDepartment);
+                    selectedDepartment = null;
+                }
+            }
+        });
+
+        // Добавляем обработчик события для кнопки "Изменить сотрудника"
+        editEmployeeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectedEmployee != null) {
+                    String newEmployeeName = JOptionPane.showInputDialog(null, "Введите новое имя сотрудника:", "Изменение сотрудника", JOptionPane.PLAIN_MESSAGE);
+                    if (newEmployeeName != null && !newEmployeeName.isEmpty()) {
+                        String newEmployeeAgeString = JOptionPane.showInputDialog(null, "Введите новый возраст сотрудника:", "Изменение сотрудника", JOptionPane.PLAIN_MESSAGE);
+                        int newEmployeeAge = Integer.parseInt(newEmployeeAgeString);
+                        String newEmployeeSalaryString = JOptionPane.showInputDialog(null, "Введите новую зарплату сотрудника:", "Изменение сотрудника", JOptionPane.PLAIN_MESSAGE);
+                        double newEmployeeSalary = Double.parseDouble(newEmployeeSalaryString);
+
+                        selectedEmployee.setName(newEmployeeName);
+                        selectedEmployee.setAge(newEmployeeAge);
+                        selectedEmployee.setSalary(newEmployeeSalary);
+
+                        int selectedIndex = employeeList.getSelectedIndex();
+                        employeeListModel.setElementAt(selectedEmployee, selectedIndex);
+                    }
+                }
+            }
+        });
+
+        // Добавляем обработчик события для кнопки "Удалить сотрудника"
+        deleteEmployeeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectedEmployee != null) {
+                    selectedDepartment.removeEmployee(selectedEmployee);
+                    employeeListModel.removeElement(selectedEmployee);
+                    selectedEmployee = null;
+                }
+            }
+        });
+
         // Добавляем обработчик события для выбора отдела
         departmentList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                Department selectedDepartment = departmentList.getSelectedValue();
+                selectedDepartment = departmentList.getSelectedValue();
                 if (selectedDepartment != null) {
                     // Отображаем информацию о выбранном отделе
                     String departmentInfo = "Отдел: " + selectedDepartment.getName() + "\nКоличество сотрудников: " + selectedDepartment.getNumberOfEmployees()
@@ -104,6 +186,8 @@ public class EnterpriseGUI extends JFrame {
                     for (Employee employee : selectedDepartment.getEmployees()) {
                         employeeListModel.addElement(employee);
                     }
+
+                    selectedEmployee = null;
                 }
             }
         });
@@ -111,7 +195,7 @@ public class EnterpriseGUI extends JFrame {
         // Добавляем обработчик события для выбора сотрудника
         employeeList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                Employee selectedEmployee = employeeList.getSelectedValue();
+                selectedEmployee = employeeList.getSelectedValue();
                 if (selectedEmployee != null) {
                     // Отображаем информацию о сотруднике
                     String employeeInfo = "ФИО: " + selectedEmployee.getName() + "\nВозраст: " + selectedEmployee.getAge() + "\nЗП: " + selectedEmployee.getSalary();
